@@ -1,6 +1,7 @@
 ﻿using System;
 using static System.Console;
 using System.Threading;
+using System.Collections.Generic;
 namespace TGL_Practice_1
 {
     /*
@@ -17,7 +18,13 @@ namespace TGL_Practice_1
         class Timber_company
         {
             //here logs of all workers are stored 
-            public static int log;
+            protected internal static int log;
+
+            protected internal static List<int> TimberMans_logs_per_shift = new List<int>();
+            protected internal static List<int> Experienced_TimberMans_logs_per_shift = new List<int>();
+
+            protected internal static int logs_gatherd_by_TimberMans_within_shift;
+            protected internal static int logs_gatherd_by_Experienced_TimberMans_within_shift;
 
             //lock for returning wood
             static Object log_deposition_lock = new Object();
@@ -70,6 +77,7 @@ namespace TGL_Practice_1
                                     break;
                             }
                         }
+                        logs_gatherd_by_TimberMans_within_shift += gatherd_logs;
                         log += gatherd_logs;
                         WriteLine("On Thread: " + threadSpecificData + " was gatherd: " + gatherd_logs + " of wood by TimberMan which brings it to total of: " + log + " logs");
                     }
@@ -116,6 +124,7 @@ namespace TGL_Practice_1
                                     break;
                                 }
                         }
+                        logs_gatherd_by_Experienced_TimberMans_within_shift += gatherd_logs;
                         log += gatherd_logs;
                         WriteLine("On Thread: "+threadSpecificData +" was gatherd: " + gatherd_logs + " of wood by Experienced TimberMan which brings it to total of: "+ log+" logs");
                     }
@@ -130,8 +139,10 @@ namespace TGL_Practice_1
                 Timber_company.Experienced_TimberMan start_Experienced_TimberMans = new Timber_company.Experienced_TimberMan();
 
                 int work_shifts = 1;
-                // iteration thro work_shifts. Set on 4 but could be any number. 
-                while (work_shifts < 5)
+
+                int amount_of_shifts = 5;
+                // iteration thro work_shifts. Set on 5 but could be any number. 
+                while (work_shifts <= amount_of_shifts)
                 {
                     WriteLine("Start of " + work_shifts + " work shift");
 
@@ -155,7 +166,12 @@ namespace TGL_Practice_1
                     TimberMan_1.Join(); TimberMan_2.Join(); TimberMan_3.Join(); TimberMan_4.Join(); TimberMan_5.Join();
                     Experienced_TimberMan_1.Join(); Experienced_TimberMan_2.Join(); Experienced_TimberMan_3.Join(); Experienced_TimberMan_4.Join(); Experienced_TimberMan_5.Join();
 
-                    if (work_shifts < 4)
+                    Timber_company.TimberMans_logs_per_shift.Add(Timber_company.logs_gatherd_by_TimberMans_within_shift);
+                    Timber_company.Experienced_TimberMans_logs_per_shift.Add(Timber_company.logs_gatherd_by_Experienced_TimberMans_within_shift);
+                    Timber_company.logs_gatherd_by_TimberMans_within_shift = 0;
+                    Timber_company.logs_gatherd_by_Experienced_TimberMans_within_shift = 0;
+
+                    if (work_shifts < amount_of_shifts)
                     {
                         WriteLine("Break Time");
                         Thread.Sleep(5000);
@@ -166,12 +182,16 @@ namespace TGL_Practice_1
                     }
                     work_shifts++;
                 }
+                for (int i=1;i<= amount_of_shifts; i++)
+                {
+                    WriteLine("During "+i+" shift TimberMan's obtained: "+Timber_company.TimberMans_logs_per_shift[i-1]+" and Experienced TimberMan's obtained: " + Timber_company.Experienced_TimberMans_logs_per_shift[i-1]);
+                }
                 WriteLine("During the day " + Timber_company.log + " logs were gatherd.");
                 ReadKey();
             }
             catch(Exception ex)
             {
-                WriteLine("Somethign went wrong. Details: "+ex);
+                WriteLine("Something went wrong. Details: "+ex);
                 ReadKey();
             }
         }
