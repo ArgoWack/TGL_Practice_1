@@ -15,22 +15,22 @@ namespace TGL_Practice_1
     */
     class Program
     {
-        class Timber_company
+        class TimberCompany
         {
             //here logs of all workers are stored 
             protected internal static int log;
 
-            protected internal static List<int> TimberMans_logs_per_shift = new List<int>();
-            protected internal static List<int> Experienced_TimberMans_logs_per_shift = new List<int>();
+            protected internal static List<int> timberMansLogsPerShift = new List<int>();
+            protected internal static List<int> experiencedTimberMansLogsPerShift = new List<int>();
 
-            protected internal static int logs_gatherd_by_TimberMans_within_shift;
-            protected internal static int logs_gatherd_by_Experienced_TimberMans_within_shift;
+            protected internal static int logsGatherdByTimberMansWithinShift;
+            protected internal static int logsGatherdByExperiencedTimberMansWithinShift;
 
             //lock for returning wood
-            static Object log_deposition_lock = new Object();
+            static Object logDepositionLock = new Object();
             protected internal abstract class Worker
             {
-                public abstract void cut_timber();
+                public abstract void cutTimber();
                 public void rest()
                 {
                     WriteLine("Worker is resting");
@@ -40,16 +40,16 @@ namespace TGL_Practice_1
             {
                 [ThreadStatic]
                 static int threadSpecificData;
-                public override void cut_timber()
+                public override void cutTimber()
                 {
                     //returns number of thread
                     threadSpecificData = Thread.CurrentThread.ManagedThreadId - 4;
-                    lock (log_deposition_lock)
+                    lock (logDepositionLock)
                     {
                         Random seed = new Random();
                         //generates random number with [0,9]
                         int chances = seed.Next(0, 10);
-                        int gatherd_logs = 0;
+                        int gatherdLogs = 0;
 
                         switch (chances)
                         {
@@ -61,25 +61,25 @@ namespace TGL_Practice_1
                             case 1:
                             {
                                     //low logs
-                                    gatherd_logs += 1;
+                                    gatherdLogs += 1;
                                  break;
                             }
                             case 9:
                             {
                                     //big portion of logs
-                                    gatherd_logs += 30;
+                                    gatherdLogs += 30;
                                     break;
                             }
                             default:
                             {
                                     //typical logs
-                                    gatherd_logs += chances*2;
+                                    gatherdLogs += chances*2;
                                     break;
                             }
                         }
-                        logs_gatherd_by_TimberMans_within_shift += gatherd_logs;
-                        log += gatherd_logs;
-                        WriteLine("On Thread: " + threadSpecificData + " was gatherd: " + gatherd_logs + " of wood by TimberMan which brings it to total of: " + log + " logs");
+                        logsGatherdByTimberMansWithinShift += gatherdLogs;
+                        log += gatherdLogs;
+                        WriteLine("On Thread: " + threadSpecificData + " was gatherd: " + gatherdLogs + " of wood by TimberMan which brings it to total of: " + log + " logs");
                     }
                 }
             }
@@ -87,16 +87,16 @@ namespace TGL_Practice_1
             {
                 [ThreadStatic]
                 static int threadSpecificData;
-                public override void cut_timber()
+                public override void cutTimber()
                 {
                     //returns number of thread
                     threadSpecificData = Thread.CurrentThread.ManagedThreadId - 4;
-                    lock (log_deposition_lock)
+                    lock (logDepositionLock)
                     {
                         Random seed = new Random();
                         //generates random number with [0,9]
                         int chances = seed.Next(0, 10);
-                        int gatherd_logs=0;
+                        int gatherdLogs = 0;
 
                         switch (chances)
                         {
@@ -108,25 +108,25 @@ namespace TGL_Practice_1
                             case 1:
                                 {
                                     //low logs
-                                    gatherd_logs += 2;
+                                    gatherdLogs += 2;
                                     break;
                                 }
                             case 9:
                                 {
                                     //big portion of logs
-                                    gatherd_logs += 50;
+                                    gatherdLogs += 50;
                                     break;
                                 }
                             default:
                                 {
                                     //typical log
-                                    gatherd_logs += chances * 3;
+                                    gatherdLogs += chances * 3;
                                     break;
                                 }
                         }
-                        logs_gatherd_by_Experienced_TimberMans_within_shift += gatherd_logs;
-                        log += gatherd_logs;
-                        WriteLine("On Thread: "+threadSpecificData +" was gatherd: " + gatherd_logs + " of wood by Experienced TimberMan which brings it to total of: "+ log+" logs");
+                        logsGatherdByExperiencedTimberMansWithinShift += gatherdLogs;
+                        log += gatherdLogs;
+                        WriteLine("On Thread: "+threadSpecificData +" was gatherd: " + gatherdLogs + " of wood by Experienced TimberMan which brings it to total of: "+ log+" logs");
                     }
                 }
             }
@@ -135,43 +135,43 @@ namespace TGL_Practice_1
         {
             try
             {
-                Timber_company.TimberMan start_timberMans = new Timber_company.TimberMan();
-                Timber_company.Experienced_TimberMan start_Experienced_TimberMans = new Timber_company.Experienced_TimberMan();
+                TimberCompany.TimberMan startTimberMans = new TimberCompany.TimberMan();
+                TimberCompany.Experienced_TimberMan startExperiencedTimberMans = new TimberCompany.Experienced_TimberMan();
 
-                int work_shifts = 1;
+                int workShifts = 1;
 
-                int amount_of_shifts = 5;
+                const int amountOfShifts = 5;
                 // iteration thro work_shifts. Set on 5 but could be any number. 
-                while (work_shifts <= amount_of_shifts)
+                while (workShifts <= amountOfShifts)
                 {
-                    WriteLine("Start of " + work_shifts + " work shift");
+                    WriteLine("Start of " + workShifts + " work shift");
 
                     //5 timberMan's threads
-                    Thread TimberMan_1 = new Thread(start_timberMans.cut_timber);
-                    Thread TimberMan_2 = new Thread(start_timberMans.cut_timber);
-                    Thread TimberMan_3 = new Thread(start_timberMans.cut_timber);
-                    Thread TimberMan_4 = new Thread(start_timberMans.cut_timber);
-                    Thread TimberMan_5 = new Thread(start_timberMans.cut_timber);
+                    Thread TimberMan1 = new Thread(startTimberMans.cutTimber);
+                    Thread TimberMan2 = new Thread(startTimberMans.cutTimber);
+                    Thread TimberMan3 = new Thread(startTimberMans.cutTimber);
+                    Thread TimberMan4 = new Thread(startTimberMans.cutTimber);
+                    Thread TimberMan5 = new Thread(startTimberMans.cutTimber);
 
                     //5 Experienced timberMan's threads
-                    Thread Experienced_TimberMan_1 = new Thread(start_Experienced_TimberMans.cut_timber);
-                    Thread Experienced_TimberMan_2 = new Thread(start_Experienced_TimberMans.cut_timber);
-                    Thread Experienced_TimberMan_3 = new Thread(start_Experienced_TimberMans.cut_timber);
-                    Thread Experienced_TimberMan_4 = new Thread(start_Experienced_TimberMans.cut_timber);
-                    Thread Experienced_TimberMan_5 = new Thread(start_Experienced_TimberMans.cut_timber);
+                    Thread ExperiencedTimberMan1 = new Thread(startExperiencedTimberMans.cutTimber);
+                    Thread ExperiencedTimberMan2 = new Thread(startExperiencedTimberMans.cutTimber);
+                    Thread ExperiencedTimberMan3 = new Thread(startExperiencedTimberMans.cutTimber);
+                    Thread ExperiencedTimberMan4 = new Thread(startExperiencedTimberMans.cutTimber);
+                    Thread ExperiencedTimberMan5 = new Thread(startExperiencedTimberMans.cutTimber);
 
-                    TimberMan_1.Start(); TimberMan_2.Start(); TimberMan_3.Start(); TimberMan_4.Start(); TimberMan_5.Start();
-                    Experienced_TimberMan_1.Start(); Experienced_TimberMan_2.Start(); Experienced_TimberMan_3.Start(); Experienced_TimberMan_4.Start(); Experienced_TimberMan_5.Start();
+                    TimberMan1.Start(); TimberMan2.Start(); TimberMan3.Start(); TimberMan4.Start(); TimberMan5.Start();
+                    ExperiencedTimberMan1.Start(); ExperiencedTimberMan2.Start(); ExperiencedTimberMan3.Start(); ExperiencedTimberMan4.Start(); ExperiencedTimberMan5.Start();
 
-                    TimberMan_1.Join(); TimberMan_2.Join(); TimberMan_3.Join(); TimberMan_4.Join(); TimberMan_5.Join();
-                    Experienced_TimberMan_1.Join(); Experienced_TimberMan_2.Join(); Experienced_TimberMan_3.Join(); Experienced_TimberMan_4.Join(); Experienced_TimberMan_5.Join();
+                    TimberMan1.Join(); TimberMan2.Join(); TimberMan3.Join(); TimberMan4.Join(); TimberMan5.Join();
+                    ExperiencedTimberMan1.Join(); ExperiencedTimberMan2.Join(); ExperiencedTimberMan3.Join(); ExperiencedTimberMan4.Join(); ExperiencedTimberMan5.Join();
 
-                    Timber_company.TimberMans_logs_per_shift.Add(Timber_company.logs_gatherd_by_TimberMans_within_shift);
-                    Timber_company.Experienced_TimberMans_logs_per_shift.Add(Timber_company.logs_gatherd_by_Experienced_TimberMans_within_shift);
-                    Timber_company.logs_gatherd_by_TimberMans_within_shift = 0;
-                    Timber_company.logs_gatherd_by_Experienced_TimberMans_within_shift = 0;
+                    TimberCompany.timberMansLogsPerShift.Add(TimberCompany.logsGatherdByTimberMansWithinShift);
+                    TimberCompany.experiencedTimberMansLogsPerShift.Add(TimberCompany.logsGatherdByExperiencedTimberMansWithinShift);
+                    TimberCompany.logsGatherdByTimberMansWithinShift = 0;
+                    TimberCompany.logsGatherdByExperiencedTimberMansWithinShift = 0;
 
-                    if (work_shifts < amount_of_shifts)
+                    if (workShifts < amountOfShifts)
                     {
                         WriteLine("Break Time");
                         Thread.Sleep(5000);
@@ -180,13 +180,13 @@ namespace TGL_Practice_1
                     {
                         WriteLine("Work is over");
                     }
-                    work_shifts++;
+                    workShifts++;
                 }
-                for (int i=1;i<= amount_of_shifts; i++)
+                for (int i=1;i<= amountOfShifts; i++)
                 {
-                    WriteLine("During "+i+" shift TimberMan's obtained: "+Timber_company.TimberMans_logs_per_shift[i-1]+" and Experienced TimberMan's obtained: " + Timber_company.Experienced_TimberMans_logs_per_shift[i-1]);
+                    WriteLine("During "+i+" shift TimberMan's obtained: "+ TimberCompany.timberMansLogsPerShift[i-1]+" and Experienced TimberMan's obtained: " + TimberCompany.experiencedTimberMansLogsPerShift[i-1]);
                 }
-                WriteLine("During the day " + Timber_company.log + " logs were gatherd.");
+                WriteLine("During the day " + TimberCompany.log + " logs were gatherd.");
                 ReadKey();
             }
             catch(Exception ex)
